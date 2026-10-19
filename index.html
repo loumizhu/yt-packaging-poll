@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Title Test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --yt-bg: #0f0f0f;
+      --yt-surface: #181818;
+      --yt-border: #272727;
+      --yt-text-primary: #f1f1f1;
+      --yt-text-secondary: #aaaaaa;
+      --yt-red: #ff0000;
+      --yt-badge-bg: rgba(0, 0, 0, 0.85);
+      --success-green: #2ba640;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--yt-bg);
+      color: var(--yt-text-primary);
+      font-family: 'Roboto', 'Arial', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Minimal YouTube Header */
+    header.yt-header {
+      height: 56px;
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--yt-border);
+      position: sticky;
+      top: 0;
+      background-color: rgba(15, 15, 15, 0.95);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+    }
+
+    .yt-logo {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--yt-text-primary);
+      font-weight: 700;
+      font-size: 19px;
+      letter-spacing: -0.5px;
+      user-select: none;
+    }
+
+    .yt-logo svg {
+      width: 28px;
+      height: 20px;
+    }
+
+    .header-badge {
+      font-size: 13px;
+      color: var(--yt-text-secondary);
+      background: var(--yt-surface);
+      padding: 5px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--yt-border);
+    }
+
+    /* Instruction Header */
+    .hero-banner {
+      max-width: 1200px;
+      margin: 32px auto 12px;
+      padding: 0 24px;
+      text-align: center;
+    }
+
+    .hero-title {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--yt-text-primary);
+    }
+
+    .hero-subtitle {
+      font-size: 15px;
+      color: var(--yt-text-secondary);
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    /* Video Cards Grid */
+    main.poll-container {
+      max-width: 1200px;
+      width: 100%;
+      margin: 24px auto 40px;
+      padding: 0 24px;
+      flex: 1;
+    }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 28px 20px;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    @media (min-width: 860px) {
+      .video-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1140px) {
+      .video-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    /* YouTube Video Card */
+    .yt-card {
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      position: relative;
+      border-radius: 12px;
+      padding: 8px;
+      background: transparent;
+      border: 1px solid transparent;
+      transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+      user-select: none;
+    }
+
+    .yt-card:hover {
+      background: var(--yt-surface);
+      border-color: var(--yt-border);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+    }
+
+    .yt-card:active {
+      transform: scale(0.98);
+    }
+
+    /* 16:9 Thumbnail Rectangle */
+    .thumbnail-box {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: radial-gradient(circle at 50% 45%, #2a2a30 0%, #151518 70%, #0d0d10 100%);
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6);
+      transition: border-color 0.2s ease;
+    }
+
+    .yt-card:hover .thumbnail-box {
+      border-color: rgba(255, 0, 0, 0.4);
+    }
+
+    /* YouTube Play Button */
+    .play-button-wrapper {
+      width: 62px;
+      height: 62px;
+      background: rgba(18, 18, 18, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    }
+
+    .play-button-wrapper svg {
+      width: 28px;
+      height: 28px;
+      margin-left: 3px;
+      fill: #ffffff;
+      transition: transform 0.2s ease;
+    }
+
+    .yt-card:hover .play-button-wrapper {
+      background: var(--yt-red);
+      border-color: var(--yt-red);
+      transform: scale(1.12);
+      box-shadow: 0 0 24px rgba(255, 0, 0, 0.65);
+    }
+
+    /* Duration Badge */
+    .duration-badge {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background-color: var(--yt-badge-bg);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 2px 5px;
+      border-radius: 4px;
+    }
+
+    /* Video Details (Just the title & YouTube views line) */
+    .video-details {
+      margin-top: 12px;
+    }
+
+    .video-title {
+      font-size: 15px;
+      font-weight: 500;
+      line-height: 22px;
+      color: var(--yt-text-primary);
+      margin-bottom: 6px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .yt-card:hover .video-title {
+      color: #ffffff;
+    }
+
+    .video-metrics {
+      font-size: 12px;
+      color: var(--yt-text-secondary);
+    }
+
+    /* Thank You View (Appears on click) */
+    .thank-you-view {
+      display: none;
+      max-width: 600px;
+      margin: 40px auto;
+      text-align: center;
+      background: var(--yt-surface);
+      border: 1px solid var(--yt-border);
+      padding: 44px 32px;
+      border-radius: 16px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+      animation: fadeInScale 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes fadeInScale {
+      from {
+        opacity: 0;
+        transform: scale(0.95) translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    .success-icon-wrapper {
+      width: 68px;
+      height: 68px;
+      background: rgba(43, 166, 64, 0.15);
+      border: 2px solid var(--success-green);
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .success-icon-wrapper svg {
+      width: 36px;
+      height: 36px;
+      fill: var(--success-green);
+    }
+
+    .thank-you-heading {
+      font-size: 24px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 10px;
+    }
+
+    .thank-you-msg {
+      font-size: 15px;
+      color: var(--yt-text-secondary);
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    .selected-title-card {
+      background: #111111;
+      border: 1px solid #333333;
+      border-left: 4px solid var(--yt-red);
+      padding: 16px 20px;
+      border-radius: 8px;
+      text-align: left;
+      margin-bottom: 24px;
+    }
+
+    .selected-label {
+      font-size: 11px;
+      color: var(--yt-red);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .selected-text {
+      font-size: 16px;
+      font-weight: 500;
+      color: #ffffff;
+      line-height: 1.4;
+    }
+
+    .btn-reset {
+      background: transparent;
+      border: 1px solid var(--yt-border);
+      color: var(--yt-text-secondary);
+      padding: 8px 18px;
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 18px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-reset:hover {
+      background: #272727;
+      color: #ffffff;
+    }
+
+    /* Submitting Indicator */
+    .status-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: rgba(30, 30, 30, 0.96);
+      border: 1px solid var(--yt-border);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px);
+      transition: all 0.25s ease;
+      z-index: 999;
+    }
+
+    .status-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast-spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: var(--yt-red);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    footer.yt-footer {
+      border-top: 1px solid var(--yt-border);
+      padding: 18px 24px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--yt-text-secondary);
+      margin-top: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top YouTube Header -->
+  <header class="yt-header">
+    <div class="yt-logo">
+      <svg viewBox="0 0 28 20">
+        <path fill="#FF0000" d="M27.97 3.12A3.5 3.5 0 0 0 25.5.65C23.32.07 14 .07 14 .07s-9.32 0-11.5.58A3.5 3.5 0 0 0 .03 3.12C-.55 5.3-.55 10-.55 10s0 4.7.58 6.88a3.5 3.5 0 0 0 2.47 2.47c2.18.58 11.5.58 11.5.58s9.32 0 11.5-.58a3.5 3.5 0 0 0 2.47-2.47c.58-2.18.58-6.88.58-6.88s0-4.7-.58-6.88z"></path>
+        <path fill="#FFFFFF" d="m11.25 14.38 7.35-4.38-7.35-4.38z"></path>
+      </svg>
+      <span>YouTube</span>
+    </div>
+
+    <div id="voterBadge" class="header-badge" style="display: none;">
+      Voter: <strong id="voterNameDisplay">Friend</strong>
+    </div>
+  </header>
+
+  <!-- Prompt Section -->
+  <section class="hero-banner" id="heroBanner">
+    <h1 class="hero-title">Which video piques your curiosity the most? ?</h1>
+    <p class="hero-subtitle">
+      Click the video that grabs your attention first.
+    </p>
+  </section>
+
+  <!-- YouTube Grid -->
+  <main class="poll-container">
+    <div class="video-grid" id="videoGrid"></div>
+
+    <!-- Thank You Confirmation View -->
+    <div class="thank-you-view" id="thankYouView">
+      <div class="success-icon-wrapper">
+        <svg viewBox="0 0 24 24">
+          <path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+        </svg>
+      </div>
+      <h2 class="thank-you-heading">Thank you for your choice!</h2>
+      <p class="thank-you-msg">
+        Your vote has been recorded.
+      </p>
+
+      <div class="selected-title-card">
+        <div class="selected-label">You Selected</div>
+        <div class="selected-text" id="selectedTitleDisplay">...</div>
+      </div>
+
+      <button class="btn-reset" id="btnChangeVote">Vote Again / Reset</button>
+    </div>
+  </main>
+
+  <!-- Live Sending Toast -->
+  <div class="status-toast" id="statusToast">
+    <div class="toast-spinner"></div>
+    <span id="toastMsg">Sending your vote...</span>
+  </div>
+
+  <footer class="yt-footer">
+    YouTube Packaging Poll
+  </footer>
+
+  <script>
+    // =========================================================================
+    // 🔴 1. PASTE YOUR DISCORD WEBHOOK URL HERE:
+    // =========================================================================
+    const DISCORD_WEBHOOK_URL = "PASTE_YOUR_DISCORD_WEBHOOK_URL_HERE";
+
+    // =========================================================================
+    // 2. VIDEO TITLES TO TEST
+    // =========================================================================
+    const VIDEO_TITLES = [
+      {
+        id: "A",
+        title: "They Made Millions as Kids. Their Parents Stole Their Fortunes."
+      },
+      {
+        id: "B",
+        title: "Child Stars Who Sued Their Parents (And Won)"
+      },
+      {
+        id: "C",
+        title: "Hollywood Child Stars & The Parents Who Took Their Money"
+      },
+      {
+        id: "D",
+        title: "Emptied Accounts: The Dark Court Battles of Hollywood Child Stars"
+      }
+    ];
+
+    // =========================================================================
+    // SCRIPT RUNTIME
+    // =========================================================================
+    const pageLoadTime = Date.now();
+    let hasVoted = false;
+
+    // Optional voter tracking from URL (e.g. ?voter=Alex)
+    const urlParams = new URLSearchParams(window.location.search);
+    const voterName = urlParams.get('voter') || urlParams.get('name') || 'Anonymous';
+
+    if (voterName !== 'Anonymous') {
+      document.getElementById('voterNameDisplay').textContent = voterName;
+      document.getElementById('voterBadge').style.display = 'block';
+    }
+
+    // Render cards (shuffled to eliminate bias)
+    function renderCards() {
+      const grid = document.getElementById('videoGrid');
+      grid.innerHTML = '';
+
+      const shuffled = [...VIDEO_TITLES].sort(() => Math.random() - 0.5);
+
+      shuffled.forEach((item) => {
+        const card = document.createElement('div');
+        card.className = 'yt-card';
+        card.onclick = () => selectTitle(item);
+
+        card.innerHTML = `
+          <div class="thumbnail-box">
+            <div class="play-button-wrapper">
+              <svg viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            </div>
+            <div class="duration-badge">23:14</div>
+          </div>
+          <div class="video-details">
+            <h3 class="video-title">${item.title}</h3>
+            <div class="video-metrics">184K views &bull; 3 days ago</div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    // Handle click
+    async function selectTitle(item) {
+      if (hasVoted) return;
+      hasVoted = true;
+
+      const dwellTimeSec = ((Date.now() - pageLoadTime) / 1000).toFixed(1);
+
+      showToast('Sending choice...');
+
+      // Send to Discord Webhook
+      await sendToDiscord(item, dwellTimeSec);
+
+      // Hide grid and show thank you view
+      const grid = document.getElementById('videoGrid');
+      const hero = document.getElementById('heroBanner');
+      const thankYou = document.getElementById('thankYouView');
+      const selectedDisplay = document.getElementById('selectedTitleDisplay');
+
+      grid.style.opacity = '0';
+      grid.style.transform = 'scale(0.96)';
+      hero.style.opacity = '0';
+
+      setTimeout(() => {
+        grid.style.display = 'none';
+        hero.style.display = 'none';
+        selectedDisplay.textContent = item.title;
+        thankYou.style.display = 'block';
+        hideToast();
+      }, 350);
+    }
+
+    // Send payload directly to Discord Webhook
+    async function sendToDiscord(item, dwellTimeSec) {
+      if (!DISCORD_WEBHOOK_URL || DISCORD_WEBHOOK_URL.includes("PASTE_YOUR_DISCORD")) {
+        console.warn("⚠️ No Discord webhook URL configured yet. Vote was saved locally:", item);
+        return;
+      }
+
+      try {
+        await fetch(DISCORD_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: 'YouTube Title Poll',
+            avatar_url: 'https://www.youtube.com/s/desktop/5be8d02c/img/favicon_144x144.png',
+            embeds: [{
+              title: '🗳️ New Title Vote Clicked!',
+              color: 0xFF0000,
+              fields: [
+                { name: 'Selected Title', value: `**${item.title}**` },
+                { name: 'Option ID', value: `Title ${item.id}`, inline: true },
+                { name: 'Voter', value: `\`${voterName}\``, inline: true },
+                { name: 'Decision Speed', value: `${dwellTimeSec} seconds`, inline: true }
+              ],
+              footer: { text: 'YouTube Packaging Test' },
+              timestamp: new Date().toISOString()
+            }]
+          })
+        });
+      } catch (err) {
+        console.error('Error sending to Discord:', err);
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('statusToast');
+      document.getElementById('toastMsg').textContent = msg;
+      toast.classList.add('show');
+    }
+
+    function hideToast() {
+      const toast = document.getElementById('statusToast');
+      toast.classList.remove('show');
+    }
+
+    // Reset button
+    document.getElementById('btnChangeVote').onclick = () => {
+      hasVoted = false;
+      document.getElementById('thankYouView').style.display = 'none';
+      const grid = document.getElementById('videoGrid');
+      const hero = document.getElementById('heroBanner');
+      grid.style.display = 'grid';
+      hero.style.display = 'block';
+      setTimeout(() => {
+        grid.style.opacity = '1';
+        grid.style.transform = 'scale(1)';
+        hero.style.opacity = '1';
+      }, 50);
+      renderCards();
+    };
+
+    // Initial render
+    renderCards();
+  </script>
+</body>
+</html>
